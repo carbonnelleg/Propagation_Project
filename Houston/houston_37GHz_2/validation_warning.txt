@@ -1,0 +1,8 @@
+# This file contains all warning messages generated on 26-Oct-2022 at 15:50:54
+
+
+# ATTENUATION DUE TO CLOUDS:
+
+_ The ITU-R P.840-4 model for the computation of the liquid water content can only provides values for p > 0.1%.
+  For all values of p < 0.1%, the liquid water content value will not be computed.
+

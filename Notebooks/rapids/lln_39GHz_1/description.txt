@@ -1,0 +1,252 @@
+# File generated on 02-Oct-2023 at 12:33:03
+# Calculation description: LLN39GHz3r 
+# This file describes the effects, the models, the inputs and the datasets used for this troposphere calculation.
+# It also describes the result files generated as output.
+
+
+# Warning: the possible figures are just indications aiming to inform about results.
+ For further visualisations, please download the job folder and generate new figures from the stored data.
+
+
+# SATELLITES INFORMATION:
+
+     * Satellite 1:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 2:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 3:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 4:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 5:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 6:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 7:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 8:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 9:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+     * Satellite 10:
+	_ Orbit type: Geostationary
+	_ Payload:
+	     - Frequency (GHz): 39.400
+	     - Polarization angle (deg): 45.000
+	     - Polarization type (0 = circular, 1 = linear): 0 
+
+
+# GROUND SITES INFORMATION:
+
+     * Site 1: Louvain-la-Neuve
+	_ Coordinates:
+	     - Latitude: 50.670 deg
+	     - Longitude: 4.610 deg
+	     - ALtitude: 0.160 km
+	_ Ground equipment:
+	     - Antenna diameter: 1.500 m
+	     - Illumination efficiency: 0.600
+	     - Minimum elevation for unblocked sky view: 5.000 deg
+
+
+# ELEVATION ANGLES:
+
+     * Elevation angle for each combination site/satellite:
+	_ Site 1 Satellite 1: 5.000 deg
+	_ Site 1 Satellite 2: 10.000 deg
+	_ Site 1 Satellite 3: 15.000 deg
+	_ Site 1 Satellite 4: 20.000 deg
+	_ Site 1 Satellite 5: 25.000 deg
+	_ Site 1 Satellite 6: 30.000 deg
+	_ Site 1 Satellite 7: 35.000 deg
+	_ Site 1 Satellite 8: 40.000 deg
+	_ Site 1 Satellite 9: 45.000 deg
+	_ Site 1 Satellite 10: 50.000 deg
+
+
+# ATMOSPHERIC PARAMETERS:
+
+     * Model and configuration:
+	_ Model: ITU-R P.835-4.
+	_ Period: Mean annual.
+	_ Number of height level: 1.
+
+     * Name, definition and unit of parameters:
+	_ p: air total pressure profile (hPa).
+	_ T: air temperature profile (K).
+	_ rho: water vapour density profile (g/m^3).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\atmosphere_param.mat
+	_ HDF5 on: \output\hdf5\atmosphere_param.h5
+	_ ASCII on: \output\ascii\atmosphere_param.csv
+
+
+# ATTENUATION DUE TO OXYGEN:
+
+     * Model and configuration:
+	_ Model: ITU-R P.676-8, general method.
+	  (Refractive index are computed again by Liebe MPM 93 model for Ndry and Nwet and by ITU-R P.453-9 model for Ntot acording to ITU-R P.676-8 model).
+	  (The attenuation and interfmediate parameters are computed on 922 height levels before the calculation of the total attenuation .
+	_ Number of elevation angles: 1.
+
+     * Name, definition and unit of parameters:
+	_ att_oxy: attenuation due to oxygen (dB).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_oxygen.mat
+	_ HDF5 on: \output\hdf5\attenuation_oxygen.h5
+	_ ASCII on: \output\ascii\attenuation_oxygen.csv
+
+
+# ATTENUATION DUE TO WATER VAPOR:
+
+     * Model and configuration:
+	_ Model: ITU-R P.676-8 model general method.
+	  (Refractive index are computed again by Liebe MPM 93 model for Ndry and Nwet and by ITU-R P.453-9 model for Ntot acording to ITU-R P.676-8 model).
+	  (The attenuation and interfmediate parameters are computed on 922 height levels before the calculation of the total attenuation .
+	_ Number of elevation angles: 1.
+
+     * Name, definition and unit of parameters:
+	_ att_vap: attenuation due to water vapor (dB).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_vapor.mat
+	_ HDF5 on: \output\hdf5\attenuation_vapor.h5
+	_ ASCII on: \output\ascii\attenuation_vapor.csv
+
+
+# ATTENUATION DUE TO CLOUDS:
+
+     * Model and configuration:
+	_ Model: ITU-R P.840-4 model.
+	  This model combines the elevation angle and attenuation probabilities.
+	_ Number of elevation angles: 1.
+	_ Number of attenuation probabilities: 1.
+
+     * Name, definition and unit of parameters:
+	_ att_cld: attenuation due to clouds (dB).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_cloud.mat
+	_ HDF5 on: \output\hdf5\attenuation_cloud.h5
+	_ ASCII on: \output\ascii\attenuation_cloud.csv
+	_ ASCII on: \output\ascii\attenuation_cloud_cdf.csv
+	_ PNG on folder: \output\graphics\
+	_ Only combined cdf (i.e. both elevation and attenuation probability) are printed.
+
+
+# ATTENUATION DUE TO RAIN:
+
+     * Model and configuration:
+	_ Model: ITU-R P.618-10 model.
+	  This model combines the elevation angle and attenuation probabilities.
+	_ Mean rain height is provided by ITU-R P. 839 model.
+	_ The rainfall rate value at 0.01% of average year is provided by ITU-R P. 837-5 model.
+	_ The k and alpha coeficients for rain attenuation are computed by ITU-R P. 837-5 model.
+	_ Number of elevation angles: 1.
+	_ Number of attenuation probabilities: 1.
+
+     * Name, definition and unit of parameters:
+	_ att_rain: attenuation due to rain (dB).
+	_ hr: mean rain height above the sea level (km).
+	_ r001: rain rate at 0.01% of the average year (mm/h).
+	_ k: k coefficient for the rain attenuation computation.
+	_ alpha: alpha coefficient for the rain attenuation computation.
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_rain.mat
+	_ HDF5 on: \output\hdf5\attenuation_rain.h5
+	_ ASCII on: \output\ascii\attenuation_rain.csv
+	_ ASCII on: \output\ascii\attenuation_rain_cdf.csv
+	_ PNG on folder: \output\graphics\
+	_ Only combined cdf (i.e. both elevation and attenuation probability) are printed.
+
+
+# ATTENUATION DUE TO SCINTILLATION:
+
+     * Model and configuration:
+	_ Model: ITU-R P.618-10 model.
+	  This model combines the elevation angle and attenuation probabilities.
+	_ Number of elevation angles: 1.
+	_ Number of attenuation probabilities: 1.
+
+     * Name, definition and unit of parameters:
+	_ att_scin: attenuation due to scintillation (dB).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_scintillation.mat
+	_ HDF5 on: \output\hdf5\attenuation_scintillation.h5
+	_ ASCII on: \output\ascii\attenuation_scintillation.csv
+	_ ASCII on: \output\ascii\attenuation_scintillation_cdf.csv
+	_ PNG on folder: \output\graphics\
+	_ Only combined cdf (i.e. both elevation and attenuation probability) are printed.
+
+
+# TOTAL ATTENUATION:
+
+     * Model and configuration:
+	_ Model: ITU-R P.618-10 model.
+	_ Effects combined: 
+	     - Attenuation due to oxygen.
+	     - Attenuation due to water vapor.
+	     - Attenuation due to clouds.
+	     - Attenuation due to rain.
+	     - Attenuation due to scintillation.
+
+     * Name, definition and unit of parameters:
+	_ att_comb = total attenuation (dB).
+
+     * Format, directory and name of result files:
+	_ MAT on: \output\mat\attenuation_total.mat
+	_ HDF5 on: \output\hdf5\attenuation_total.h5
+	_ ASCII on: \output\ascii\attenuation_total.csv
+	_ PNG on folder: \output\graphics\
+	_ Only combined cdf (i.e. both elevation and attenuation probability) are printed.
+
+

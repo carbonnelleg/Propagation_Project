@@ -1,0 +1,15 @@
+# This file is generated on 02-Oct-2023 at 12:35:58 and contains for each site, each satellite, frequency:
+# att_vap = attenuation due to water vapor (dB).
+# All parameters are computed by: ITU-R P.676-8 model general method.
+# Attenuation due to water vapor results are sorted acording to the site identification number:
+#    _ 1 = Louvain-la-Neuve (Lat = 5.0670e+01 deg, Lon = 4.6100e+00 deg, Alt = 1.6000e-01 km)
+# Stored values are organised as follow:
+# Site number, Satellite number, Frequency (GHz), Elevation angle (deg), Elevation probability (), att_vap (dB)
+1, 1, 3.9400e+01, 5.5000e+01, 1.0000e+00, 1.5446e-01
+1, 2, 3.9400e+01, 6.0000e+01, 1.0000e+00, 1.4610e-01
+1, 3, 3.9400e+01, 6.5000e+01, 1.0000e+00, 1.3961e-01
+1, 4, 3.9400e+01, 7.0000e+01, 1.0000e+00, 1.3465e-01
+1, 5, 3.9400e+01, 7.5000e+01, 1.0000e+00, 1.3100e-01
+1, 6, 3.9400e+01, 8.0000e+01, 1.0000e+00, 1.2849e-01
+1, 7, 3.9400e+01, 8.5000e+01, 1.0000e+00, 1.2702e-01
+1, 8, 3.9400e+01, 9.0000e+01, 1.0000e+00, 1.2654e-01

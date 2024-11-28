@@ -1,0 +1,8 @@
+# This file is generated on 26-Aug-2022 at 13:59:15 and contains for each site:
+# press = air total pressure (hPa); temp = air temperature (K); vap = water vapour density (g/m^3) and hl = height level of reference amsl (km).
+# All parameters are computed by: ITU-R P.835-4 model on Mean annual period.
+# Atmospheric results are sorted acording to the site identification number:
+#    _ 1 = Louvain-la-Neuve (Lat = 5.0670e+01 deg, Lon = 4.6100e+00 deg, Alt = 1.6000e-01 km)
+# Stored values are organised as follow:
+# Site number, height level of reference amsl (km), press (hPa), temp (K), vap (g/m^3)
+1, 1.6000e-01, 9.9408e+02, 2.8711e+02, 6.9234e+00
