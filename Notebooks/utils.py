@@ -31,20 +31,21 @@ def add_flags(df_event, df_ch1, df_ch2, df_ch3, df_ch4):
     def flag(df_event,df):
         df['flag'] = np.zeros_like(df['signal'], dtype=int)
         df['ind_event'] = np.zeros_like(df['signal'], dtype=int)
-        for i in range(0, len(df_event)):
-            time_start = pd.to_datetime(df_event.loc[i]['DATE'], format='%Y-%m-%d') + pd.to_timedelta(df_event.loc[i]['TIME START'])
-            time_stop = pd.to_datetime(df_event.loc[i]['DATE'], format='%Y-%m-%d') + pd.to_timedelta(df_event.loc[i]['TIME STOP']) 
+        for i, event in df_event.iterrows():
+            time_start = event.loc['TIME START']
+            time_stop = event.loc['TIME STOP']
 
-            idx = (df.index > time_stop)
-            df.loc[idx, 'ind_event'] = i+1
-
-            idx = (df.index >= time_start) & (df.index <= time_stop)
+            cond_idx = (df.index > time_stop)
+            df.loc[cond_idx, 'ind_event'] = i+1
+            
+            cond_idx = (df.index >= time_start) & (df.index <= time_stop)
             if df_event.loc[i]['EVENT'] == 'rain': # set flag 1 for rain
-                df.loc[idx,'flag'] = 1
-                df.loc[idx, 'ind_event'] = -1
+                df.loc[cond_idx, 'flag'] = 1
+                df.loc[cond_idx, 'ind_event'] = -1
             if df_event.loc[i]['EVENT'] == 'failure': # set flag 2 for failure
-                df.loc[idx,'flag'] = 2
-                df.loc[idx, 'ind_event'] = -1
+                df.loc[cond_idx, 'flag'] = 2
+                df.loc[cond_idx, 'ind_event'] = -1
+
         return df
     
     return flag(df_event,df_ch1), flag(df_event,df_ch2), flag(df_event,df_ch3), flag(df_event,df_ch4)
