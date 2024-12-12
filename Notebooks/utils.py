@@ -52,7 +52,7 @@ def add_flags(df_event, df_ch1, df_ch2, df_ch3, df_ch4):
     
     
     
-def plot_one_day_4ch(date, df_ch1, df_ch2, df_ch3, df_ch4, bool_save = False):
+def plot_one_day_4ch(date, df_ch1, df_ch2, df_ch3, df_ch4, signal_filt=False, excess_attenuation=False, bool_save=False, show=False):
     """
     Plot time series for one day (midnight to midnight)
     """
@@ -79,27 +79,35 @@ def plot_one_day_4ch(date, df_ch1, df_ch2, df_ch3, df_ch4, bool_save = False):
             df = df_ch4
             
         time = df.index
-        signal = df['signal']
-        noise = df['noise']
-  
-        axs[i%2,i//2].plot(time,signal)
-        axs[i%2,i//2].plot(time,noise,color="gray")
-        axs[i%2,i//2].grid()
-        axs[i%2,i//2].set_ylim(-50,20)
-        axs[i%2,i//2].set_ylabel("Power [dB]")
-        axs[i%2,i//2].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        if not excess_attenuation:
+            signal = df['signal']
+            noise = df['noise']
+
+            axs[i%2,i//2].plot(time,signal, color='lightblue')
+            axs[i%2,i//2].plot(time,noise,color="gray")
+            if signal_filt: axs[i%2,i//2].plot(time, df['signal_filt'], color="darkblue")
+            axs[i%2,i//2].grid()
+            axs[i%2,i//2].set_ylim(-50,20)
+            axs[i%2,i//2].set_ylabel("Power [dB]")
+            axs[i%2,i//2].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        else:
+            axs[i%2,i//2].plot(time, df['excess_attenuation'], color='lightblue')
+            axs[i%2,i//2].plot(time, np.zeros_like(time, dtype=float), color='red')
+            axs[i%2,i//2].grid()
+            axs[i%2,i//2].set_ylabel("Power [dB]")
+            axs[i%2,i//2].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
         
         # Show rain events & determine start and stop times of rain event during the day
         idx_start = []
         idx_stop = []
-        if df['flag'][0] == 1: #if rain at the start of the day
+        if df.loc[:, 'flag'][0] == 1: #if rain at the start of the day
             idx_start.append(0)
-        for idx in np.where(np.diff(df['flag'].values) == True)[0]: #find index of 0 to 1 transitions in flags
+        for idx in np.where(np.diff(df.loc[:, 'flag'].values) == True)[0]: #find index of 0 to 1 transitions in flags
             idx_start.append(idx) 
-        for idx in np.where(-np.diff(df['flag'].values) == True)[0]: #find index of 1 to 0 transitions in flags
+        for idx in np.where(-np.diff(df.loc[:, 'flag'].values) == True)[0]: #find index of 1 to 0 transitions in flags
             idx_stop.append(idx) 
-        if df['flag'][-1] == 1: #if rain at the end of the day
-            idx_stop.append(len(df['flag'])-1)
+        if df.loc[:, 'flag'][-1] == 1: #if rain at the end of the day
+            idx_stop.append(len(df.loc[:, 'flag'])-1)
             
         for k in range(0,len(idx_start)):
             axs[i%2,i//2].axvspan(df.index[idx_start[k]],df.index[idx_stop[k]], color='red', alpha=0.25)
@@ -107,7 +115,7 @@ def plot_one_day_4ch(date, df_ch1, df_ch2, df_ch3, df_ch4, bool_save = False):
         # Show failure events
         idx_start = []
         idx_stop = []
-        flag_failure = np.copy(df['flag'].values)
+        flag_failure = np.copy(df.loc[:, 'flag'].values)
         flag_failure[flag_failure<=1] = 0
         flag_failure = flag_failure / 2
         if flag_failure[0] == 1: 
@@ -125,7 +133,11 @@ def plot_one_day_4ch(date, df_ch1, df_ch2, df_ch3, df_ch4, bool_save = False):
     fig.suptitle("Alphasat received data at LLN for "+ date.strftime('%Y-%m-%d'),fontsize=14)
     
     if bool_save:
-        fig.savefig('figures/'+date.strftime('%Y_%m_%d')+'.png')
+        fig.savefig(f'figures/{date.strftime('%B%Y')}/{date.strftime('%Y_%m_%d')} ' +
+        f'{int(excess_attenuation)*"excess attenuation"+int(signal_filt)*'filtered'}.png')
+    
+    if not show:
+        plt.close()
         
 def plot_RAPIDS_outputs(rapids_data,title):
     """
