@@ -3,6 +3,9 @@
 Created on Tue Jan 14 10:14:16 2025
 
 @author: carbonnelleg
+
+Interesting links:
+    http://aprs.org/LEO-tracking.html
 """
 
 import numpy as np
@@ -31,6 +34,7 @@ print(AlphaSat)
 IridiumSatellites = []
 # https://en.wikipedia.org/wiki/Iridium_satellite_constellation#Ground_stations
 # https://www.n2yo.com/satellites/?c=15&srt=1&dir=1&p=0
+# height = 787
 for i in range(100, 190):
     try:
         IridiumSatellites.append(by_name[f'IRIDIUM {i}'])
@@ -41,6 +45,7 @@ GlobalStarSatellites = []
 # https://en.wikipedia.org/wiki/Globalstar#Products_and_services
 # https://www-sop.inria.fr/members/Eitan.Altman/DEASAT/deasat4.pdf
 # https://space.skyrocket.de/doc_sdat/globalstar-2.htm
+# height = 1420
 for i in range(73, 98):
     try:
         GlobalStarSatellites.append(by_name[f'GLOBALSTAR M{i:0>3d}'])
@@ -72,6 +77,7 @@ def relative_pos_evolution(
     altitudes = np.full_like(times, 0.0, dtype=float)
     azimuths = np.full_like(times, 0.0, dtype=float)
     distances = np.full_like(times, 0.0, dtype=float)
+    neg_alt = np.full_like(times, False, dtype=bool)
     for i, t in enumerate(times):
         topocentric = relative_position.at(t)
         # satellite position relative to ground station
@@ -79,59 +85,80 @@ def relative_pos_evolution(
         altitudes[i] = alt.degrees
         azimuths[i] = az.degrees
         distances[i] = dist.km
-    return (altitudes, azimuths, distances)
+        neg_alt[i] = alt.degrees < 1
+    # distance[i] should be related to altitudes[i] by the following equation
+    # dist = -R*sin(alt) + sqrt( R**2*sin(alt)**2 + h**2 + 2*R*h )
+    # where R is Earth's radius and h is height of satellites above R (constant)
+    # This formula is yielded by applying Law of cosines in a triangle
+    return (altitudes, azimuths, distances, neg_alt)
 
 
 def calc_elev_metric(satellite, ground_station):
-    print(f'### Calculationg elevation metric of {satellite.name} ###')
-    altitudes, * \
-        _ = relative_pos_evolution(
-            satellite, ground_station, ndays=1, interval=1)
-    count, bins = np.histogram(altitudes, bins=np.arange(-90., 90., 10.),
-                               density=True)
-    l = len(count)//2
-    return 1/2*np.dot(count[l:], bins[l:-1] + bins[l+1:])
+    print(f'### Calculating elevation metric of {satellite.name} ###')
+    altitudes, _, _, neg_alt = relative_pos_evolution(
+        satellite, ground_station, ndays=1, interval=1)
+    if neg_alt.any():
+        return altitudes[~neg_alt].sum()/len(altitudes)
+    else:
+        return altitudes.sum()/len(altitudes)
 
 
 def plot_elev_angle(satellite, ground_station):
-    print(f'### Plotting {satellite.name} ###')
+    print(f'### Plotting elevation of {satellite.name} ###')
+    # Determine if satellite is LEO, but with certain probability of mistake
+    # If the satellite follows elliptic curve and is near perigee, then result might be wrong
     isLEO = wgs84.height_of(satellite.at(satellite.epoch)).km <= 2_000
-    altitudes, azimuths, _ = relative_pos_evolution(
+    # isLEO is not used here but could help discriminate LEO satellites from non-LEO
+    altitudes, azimuths, distances, neg_alt = relative_pos_evolution(
         satellite, ground_station, ndays=1, interval=1)
     dt = satellite.epoch.utc_datetime()
 
-    color = 'green' if isLEO else 'red'
-    fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(9, 7))
-    ax1.scatter(azimuths, altitudes, s=.5, c=color)
+    fig, (ax1, ax2) = plt.subplots(
+        nrows=2, height_ratios=(3, 2), figsize=(9, 7))
+    scatter = ax1.scatter(azimuths[~neg_alt], altitudes[~neg_alt], s=3.,
+                          c=distances[~neg_alt], cmap='jet',
+                          vmin=0., vmax=np.max(distances))
+    if neg_alt.any():
+        ax1.scatter(azimuths[neg_alt], altitudes[neg_alt], s=.4, c='gray')
     ax1.set_xlabel('Azimuth angle [°]')
     ax1.set_ylabel('Elevation angle [°]')
     ax1.grid(True)
-    ax2.hist(altitudes, bins=np.arange(-90., 90., 10.), color=color)
+    fig.colorbar(scatter, ax=ax1, orientation='vertical',
+                 label='Distance [km]')
+
+    bins = np.arange(-92.5, 97.5, 5.)
+    bins[0] = -90.
+    bins[-1] = 90.
+    counts, *_ = ax2.hist(altitudes, bins=bins, color='green')
     ax2.set_xlim((-95., 95.))
     ax2.set_xlabel('Elevation angle [°]')
     ax1.set_title(dt.date())
     fig.suptitle(satellite.name)
+
     fig.savefig(
         __file__ + f'/../figures/Satellites angles (Houston)/{satellite.name.replace("/", "")}.png')
     plt.close()
 
+    return (counts, bins)
+
 
 def best_elev_angle(relative_positions, t):
-
-    i_max = 0
+    best_i = 0
     alt_max = -90.0
-    az_max = 0.0
+    best_az = 0.0
+    best_dist = 0.0
     for i, pos in enumerate(relative_positions):
         topocentric = pos.at(t)
-        alt, az, _ = topocentric.altaz()
+        alt, az, dist = topocentric.altaz()
         if alt.degrees > alt_max:
-            i_max = i
+            best_i = i
             alt_max = alt.degrees
-            az_max = az.degrees
-    return (i_max, alt_max, az_max)
+    _, best_az, best_dist = relative_positions[best_i].at(t).altaz()
+    return (best_i, alt_max, best_az.degrees, best_dist.km)
 
 
 def plot_best_elev_angle(satellites, ground_station, name):
+    print(f'### Plotting elevation of {name} ###')
     relative_positions = [sat - ground_station for sat in satellites]
     dt = satellites[0].epoch.utc_datetime()
     Y = dt.year
@@ -142,18 +169,27 @@ def plot_best_elev_angle(satellites, ground_station, name):
              for m in range(0, 24*60, 10)]
     altitudes = np.full_like(times, 0.0, dtype=float)
     azimuths = np.full_like(times, 0.0, dtype=float)
+    distances = np.full_like(times, 0.0, dtype=float)
     for j, t in enumerate(times):
-        i_max, alt_max, az = best_elev_angle(relative_positions, t)
+        _, alt_max, az, dist = best_elev_angle(relative_positions, t)
         altitudes[j] = alt_max
         azimuths[j] = az
-        print(i_max)
+        distances[j] = dist
 
     fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(9, 7))
-    ax1.scatter(azimuths, altitudes, s=.5)
+    scatter = ax1.scatter(azimuths, altitudes, s=1.,
+                          c=distances, cmap='jet',
+                          vmin=0., vmax=np.max(distances))
     ax1.set_xlabel('Azimuth angle [°]')
     ax1.set_ylabel('Elevation angle [°]')
     ax1.grid(True)
-    ax2.hist(altitudes, bins=np.arange(-90., 90., 10.))
+    fig.colorbar(scatter, ax=ax1, orientation='vertical',
+                 label='Distance [km]')
+
+    bins = np.arange(-92.5, 97.5, 5.)
+    bins[0] = -90.
+    bins[-1] = 90.
+    counts, *_ = ax2.hist(altitudes, bins=bins)
     ax2.set_xlim((-95., 95.))
     ax2.set_xlabel('Elevation angle [°]')
     ax1.set_title(dt.date())
@@ -162,6 +198,25 @@ def plot_best_elev_angle(satellites, ground_station, name):
         __file__ + f'/../figures/Satellites angles (Houston)/{name}.png')
     plt.close()
 
+    return (counts, bins)
+
+
+def calc_best_elev_metrics(satellites, ground_station, name):
+    print(f'### Calculating elevation metric of {name} ###')
+    relative_positions = [sat - ground_station for sat in satellites]
+    dt = satellites[0].epoch.utc_datetime()
+    Y = dt.year
+    M = dt.month
+    D = dt.day
+    times = [ts.utc(Y, M, D + d, 0, m, 0)
+             for d in range(-1, 2)
+             for m in range(0, 24*60, 1)]
+    altitudes = np.full_like(times, 0.0, dtype=float)
+    for j, t in enumerate(times):
+        _, alt_max, *_ = best_elev_angle(relative_positions, t)
+        altitudes[j] = alt_max
+    return altitudes.mean()
+
 
 for sat in IridiumSatellites + GlobalStarSatellites:
     # uncomment to generate plots of elevation angles
@@ -169,5 +224,7 @@ for sat in IridiumSatellites + GlobalStarSatellites:
     # print(calc_elev_metric(sat, Houston))
     pass
 
-plot_best_elev_angle(GlobalStarSatellites, Houston, 'GlobalStar')
-plot_best_elev_angle(IridiumSatellites, Houston, 'Iridium')
+# plot_best_elev_angle(GlobalStarSatellites, Houston, 'GlobalStar')
+# plot_best_elev_angle(IridiumSatellites, Houston, 'Iridium')
+# print(calc_best_elev_metrics(IridiumSatellites, Houston, 'Iridium Satellites'))
+# print(calc_best_elev_metrics(GlobalStarSatellites, Houston, 'GlobalStar Satellites'))
