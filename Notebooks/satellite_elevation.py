@@ -16,7 +16,7 @@ from skyfield.api import load, wgs84, EarthSatellite
 # Enter latitude [°], longitude [°] and altitude [m] of your ground station
 LLN = wgs84.latlon(50.67, 4.61, 160)  # LLN for example
 # NASA Johnson Space Center in Houston
-Houston = wgs84.latlon(29.5594, -95.0903)
+Houston = wgs84.latlon(29.5594, -95.0903, 500)
 ts = load.timescale()
 
 satellite_url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle'
@@ -31,21 +31,24 @@ line2 = '2 39215   2.9165   5.6981 0002326 297.2202  81.4506  1.00268209 38813'
 AlphaSat = EarthSatellite(line1, line2, 'AlphaSat', ts)
 print(AlphaSat)
 
-IridiumSatellites = []
+
 # https://en.wikipedia.org/wiki/Iridium_satellite_constellation#Ground_stations
 # https://www.n2yo.com/satellites/?c=15&srt=1&dir=1&p=0
-# height = 787
-for i in range(100, 190):
+# Iridium NEXT project; 80 satellites constellation
+# height = 780
+IridiumSatellites = []
+for i in range(100, 181):
     try:
-        IridiumSatellites.append(by_name[f'IRIDIUM {i}'])
+        IridiumSatellites.append(by_name[f'IRIDIUM {i:0>3d}'])
     except KeyError as e:
         pass
 
-GlobalStarSatellites = []
 # https://en.wikipedia.org/wiki/Globalstar#Products_and_services
 # https://www-sop.inria.fr/members/Eitan.Altman/DEASAT/deasat4.pdf
 # https://space.skyrocket.de/doc_sdat/globalstar-2.htm
-# height = 1420
+# GlobalStar 2nd generation; 25 satellites constellation
+# height = 1414
+GlobalStarSatellites = []
 for i in range(73, 98):
     try:
         GlobalStarSatellites.append(by_name[f'GLOBALSTAR M{i:0>3d}'])
